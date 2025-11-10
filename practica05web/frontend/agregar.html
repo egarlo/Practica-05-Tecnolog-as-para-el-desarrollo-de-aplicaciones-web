@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agregar Libro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>📘 Agregar nuevo libro</h1>
+  </header>
+
+  <main class="form-container">
+    <form id="formLibro" enctype="multipart/form-data">
+      <label>ISBN:</label>
+      <input type="text" id="isbn" required />
+
+      <label>Título:</label>
+      <input type="text" id="titulo" required />
+
+      <label>Año:</label>
+      <input type="number" id="anio" placeholder="1986" />
+
+      <label>Páginas:</label>
+      <input type="number" id="paginas" placeholder="1138" />
+
+      <label>Precio:</label>
+      <input type="number" id="precio" step="0.01" placeholder="350.00" />
+
+      <label>Formato:</label>
+      <select id="formato">
+        <option value="FISICO">Físico</option>
+        <option value="DIGITAL">Digital</option>
+      </select>
+
+      <label>Portada (imagen):</label>
+      <input type="file" id="portada" accept="image/*" />
+
+      <button type="submit">Agregar Libro</button>
+    </form>
+
+    <p id="mensaje"></p>
+  </main>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    document.getElementById("formLibro").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const mensaje = document.getElementById("mensaje");
+
+      // 1️⃣ Crear el libro
+      const nuevoLibro = {
+        isbn: document.getElementById("isbn").value,
+        titulo: document.getElementById("titulo").value,
+        editorial_id: null,
+        edicion: null,
+        anio: parseInt(document.getElementById("anio").value) || null,
+        paginas: parseInt(document.getElementById("paginas").value) || null,
+        categoria_id: null,
+        precio: parseFloat(document.getElementById("precio").value) || 0,
+        formato: document.getElementById("formato").value,
+        publico_id: null,
+        serie_id: null,
+        num_en_serie: null,
+        portada: null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/libros`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevoLibro)
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.detail || "Error al agregar libro");
+        }
+
+        const libroCreado = await res.json();
+
+        // 2️⃣ Si hay imagen, subirla
+        const fileInput = document.getElementById("portada");
+        if (fileInput.files.length > 0) {
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+
+          const resImg = await fetch(`${API_BASE}/libros/${libroCreado.isbn}/portada`, {
+            method: "POST",
+            body: formData
+          });
+
+          if (resImg.ok) {
+            const dataImg = await resImg.json();
+            mensaje.textContent = `✅ Libro "${libroCreado.titulo}" agregado con portada.`;
+            mensaje.style.color = "green";
+          } else {
+            mensaje.textContent = "⚠️ Libro agregado, pero no se pudo subir la imagen.";
+            mensaje.style.color = "orange";
+          }
+        } else {
+          mensaje.textContent = `✅ Libro "${libroCreado.titulo}" agregado sin portada.`;
+          mensaje.style.color = "green";
+        }
+
+        e.target.reset();
+      } catch (err) {
+        mensaje.textContent = "❌ " + err.message;
+        mensaje.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de Librería</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Catálogo de Libros</h1>
+  </header>
+
+  <main>
+    <!-- contenedor del catálogo -->
+    <div id="catalogo" class="grid-libros"></div>
+    <p id="loading" class="loading">Cargando libros...</p>
+  </main>
+
+  <!-- 🟣 Modal para mostrar detalle del libro -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="cerrarModal" class="close">&times;</span>
+      <h2 id="modalTitulo"></h2>
+      <p><strong>Autor(es):</strong> <span id="modalAutores"></span></p>
+      <p><strong>Editorial:</strong> <span id="modalEditorial"></span></p>
+      <p><strong>Año:</strong> <span id="modalAnio"></span></p>
+      <p><strong>ISBN:</strong> <span id="modalIsbn"></span></p>
+      <div id="modalEtiquetas"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
